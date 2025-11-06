@@ -1,0 +1,11 @@
+./bin/catacondensed 6 b f b7.plc p 
+
+number of skeletons: 21
+With trivial group: 5
+With nontrivial group: 16
+
+number of labelled skeletons: 169
+Accepted 81 benzenoids.
+
+	CPU Time     :Too small to calculate
+	System time    :Too small to calculate

@@ -8,4 +8,4 @@ W = np.array([
     [1,  6,  14, 14],
 ])
 
-print(np.linalg.det(W))
+print(np.linalg.det(tsW))
