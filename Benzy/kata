@@ -1,0 +1,6 @@
+#!/bin/bash
+
+./catacondensed "$1" B b f "$1b.bec" > /dev/null 2>&1
+echo "$1b.bec"
+./catacondensed "$1" b f "$1b.plc" p > /dev/null 2>&1
+echo "$1b.plc"
