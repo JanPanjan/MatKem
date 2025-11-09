@@ -1,11 +1,12 @@
 import sys
+from pprint import pprint
 import networkx as nx
 from networkx import Graph
 import matplotlib.pyplot as plt
 
 Crd = tuple[int, int]  # coordinate
 Vtx = int  # vertex
-CrdLst = dict[Vtx, Crd]  # list of coordinates for every vertex
+CrdLst = dict[Vtx, Crd]
 
 
 class CoordinateSystem():
@@ -36,9 +37,7 @@ class CoordinateSystem():
         self.__calc_coord(bec)
 
     def __move(self, node: Crd, move: Crd) -> Crd:
-        """
-        Moves node to new coordinates specified by move (change of x and y)
-        """
+        """ Moves node to new coordinates specified by move (change of x and y) """
         return (node[0] + move[0], node[1] + move[1])
 
     def __add(self,
@@ -46,7 +45,7 @@ class CoordinateSystem():
               clst: CrdLst,
               rotation: int,
               p: None | Crd = None) -> None:
-
+        """ Adds new coordinate to coordinate list, based on previous node and move step.  """
         # predecessor
         if p is None:
             p = self.clst[node_id - 1]
@@ -57,8 +56,7 @@ class CoordinateSystem():
 
     # TODO
     def __fill_me_up(self) -> None:
-        """
-        Fills up the coordinate list with missing edges and vertices
+        """ Fills up the coordinate list with missing edges and vertices
 
         Parameters:
             `clst`: coordinate list for all nodes
@@ -96,8 +94,8 @@ class CoordinateSystem():
                              ×     ×                      ×     ×
                 start --> 1 --> 2 --> 3 -------------> x --> y --> z --> NULL
                           |     |     |       ...      |     |     |
-             next run --> 4     5     6                ×     ×     ×
-                       ×     ×     ×     ×         ×      ×     ×
+                          ×     ×     ×                ×     ×     ×
+          next run --> 4     5     6     7         ×      ×     ×
                        |     |     |     |         |      |     |
                                ...                     ...
                                ...                     ...
@@ -106,6 +104,7 @@ class CoordinateSystem():
                           ×     ×     ×     ×     ×     ×      ×
                        ×     ×     ×     ×     ×     ×      ×     ×
                        |     |     |     |     |     |      |     |
+                       ×     ×     ×     ×     ×     ×      ×     ×
                           ×     ×     ×     ×     ×     ×      ×
 
         Node 1 has 2 as it's neighbouring HN, so the hexagon is traced and any missing
@@ -117,8 +116,7 @@ class CoordinateSystem():
         raise NotImplementedError
 
     def __next_rotation(self, r: int):
-        """
-        Gets the next valid rotation, moving to the beginning/end of moveset if necessary.
+        """ Gets the next valid rotation, moving to the beginning/end of moveset if necessary.
 
         The first calculated coordinate will always be done by an up-right move.
         First calculated coordinate after a new digit is read will always be done
@@ -156,9 +154,9 @@ class CoordinateSystem():
             case _:
                 return r
 
+    # BUG: detecting HN nodes is not correct
     def __calc_coord(self, bec: str) -> CrdLst:
-        """
-        Calculates coordinates for all nodes.
+        """ Calculates coordinates for all nodes.
 
         Coordinates take place in the standard x-y-axial coordinate system.
         Each hexagon is composed of 6 coordinates. They follow the @self.moveset
@@ -188,18 +186,21 @@ class CoordinateSystem():
             digit = int(digit)
             for _ in range(digit):
                 i += 1
-                print("===========================================================================")
-                print(f"digit: {digit}  i: {i}  r: {r}, move: {self.__moveset[r]}")
-                self.__add(i, self.clst, r, None)
-                print("---------------------------------------------------------------------------")
+                # print("===========================================================================")
+                # print(f"digit: {digit}  i: {i}  r: {r}, move: {self.__moveset[r]}")
 
+                self.__add(i, self.clst, r, None)
+
+                # print("---------------------------------------------------------------------------")
+
+                # BUG: fix this HN detection
                 if self.__moveset[r] in self.__hn_moveset:  # it found a HN
-                    print(f"Found HN: i: {i}")
+                    # print(f"Found HN: i: {i}")
                     self.__add(i, self.__hn_clst, r, self.clst[i - 1])
 
-                print("---------------------------------------------------------------------------")
-                print(f"clst: {self.clst}")
-                print(f"clst: {self.__hn_clst}")
+                # print("---------------------------------------------------------------------------")
+                # print(f"clst: {self.clst}")
+                # print(f"clst: {self.__hn_clst}")
 
                 r = self.__next_rotation(r)
                 sc = self.clst[i]
@@ -209,7 +210,7 @@ class CoordinateSystem():
         # add missing edges and nodes to the list
         # clst = self.__fill_me_up(clst, hn_clst)
         print(("HN list of coordinates:"))
-        print(self.__hn_clst)
+        pprint(self.__hn_clst)
         return self.clst
 
 
@@ -225,9 +226,7 @@ class Benzy():
         self.coordinates: CoordinateSystem = CoordinateSystem(self.bec)
 
     def draw_bs(self) -> None:
-        """
-        Plots the benzenoid system.
-        """
+        """ Plots the benzenoid system.  """
         nx.draw(
             G=self.graph,
             pos=self.coordinates.clst,
@@ -240,6 +239,10 @@ class Benzy():
         plt.show()
 
     def check_bec(self, bec: str) -> str:
+        """ Makes sure that the provided BEC is valid.
+
+        Valid BEC is composed only of numbers between 1-5.
+        """
         for d in bec:
             if not d.isdigit():
                 raise ValueError("Illegal boundary edges code. Must be numeric.")
@@ -248,9 +251,7 @@ class Benzy():
         return bec
 
     def __graph_from_bec(self) -> Graph:
-        """
-        Creates a networkx graph.
-        """
+        """ Creates a networkx graph.  """
         g = Graph()
         g.add_edges_from([(i, i + 1) for i in range(1, self.np)])
         g.add_edge(self.np, 1)  # connect the graph
