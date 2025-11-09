@@ -52,7 +52,6 @@ class CoordinateSystem():
             p = self.clst[node_id - 1]
         move: Crd = self.__moveset[rotation]
         new_crd: Crd = self.__move(p, move)
-
         clst[node_id] = new_crd
         return
 
