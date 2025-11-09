@@ -80,12 +80,9 @@ class Benzy():
             self,
             node_id: int,
             cds: CrdLst,
-            rotation: int,
-            previous: Crd
+            rotation: int
     ) -> None:
-        move: Crd = self.moveset[rotation]
-        next: Crd = self.__move(previous, move)
-        cds[node_id] = next  # don't bother checking if they already exist...
+        cds[node_id] = self.__move(cds[node_id - 1], self.moveset[rotation])
         return
 
     def __move(self, node: Crd, move: Crd) -> Crd:
@@ -112,9 +109,9 @@ class Benzy():
                 return r
 
     def __search_nodes(self, clst: CrdLst) -> CrdLst:
-        pass
+        raise NotImplementedError
 
-    def __fil_me_up(self, clst: CrdLst) -> CrdLst:
+    def __fill_me_up(self, clst: CrdLst) -> CrdLst:
         """
         Fills up the coordinate list with missing edges and vertices, since
         the original list contains only vertices and edges that form the
@@ -131,7 +128,7 @@ class Benzy():
                                 ×     × <-- to this
                                    ×
         """
-        pass
+        raise NotImplementedError
 
     def __calc_coord(self) -> CrdLst:
         """
@@ -160,7 +157,7 @@ class Benzy():
             digit = int(digit)
             for _ in range(digit):
                 i += 1
-                self.__add_cdt(i, clst, r, sc)
+                self.__add_cdt(i, clst, r)
                 r = self.__next_rotation(r)
                 sc = clst[i]
             # store next starting direction
