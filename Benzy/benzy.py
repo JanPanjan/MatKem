@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from pprint import pprint
 from networkx import Graph
 
-Coordinates = tuple[int, int] 
+Coordinates = tuple[int, int]
 Vertex = int
 CoordinateList = dict[Vertex, Coordinates]
 
@@ -76,11 +76,18 @@ class CoordinateSystem():
         Returns two lists, one of sorted node ids and one of sorted node coordinates.
         """
         sorted_ids: list[Vertex]
-        sorted_coordinates: list[Coordinate] = []
-        sort_fun = lambda key: (-self.primary_coordinates[key][1], self.primary_coordinates[key][0])
+        sorted_coordinates: list[Coordinates] = []
 
-        sorted_ids = sorted(self.primary_coordinates, key=sort_fun, reverse=False)
-        [sorted_coordinates.append(self.primary_coordinates[sorted_ids[i]]) for i in range(len(sorted_ids))]
+        sorted_ids = sorted(
+            self.primary_coordinates,
+            key=lambda key: (
+                -self.primary_coordinates[key][1],
+                self.primary_coordinates[key][0]
+            ),
+            reverse=False
+        )
+        [sorted_coordinates.append(self.primary_coordinates[sorted_ids[i]])
+         for i in range(len(sorted_ids))]
 
         return sorted_ids, sorted_coordinates
 
@@ -142,7 +149,7 @@ class CoordinateSystem():
         rotation = 0
         current_node: tuple[Vertex, Coordinates] = (sorted_ids[0], sorted_coordinates[0])
         for i in range(pn):
-            self.__trace_hexagon(current_node)  
+            self.__trace_hexagon(current_node)
 
             try:
                 next_primary_node: tuple[Vertex, Coordinates] = (sorted_ids[i+1], sorted_coordinates[i+1]) # exception will happen here
