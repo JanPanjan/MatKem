@@ -4,17 +4,16 @@ import matplotlib.pyplot as plt
 from pprint import pprint
 from networkx import Graph
 
-Coordinates = tuple[int, int]  # coordinate
-Vertex = int  # vertex
+Coordinates = tuple[int, int] 
+Vertex = int
 CoordinateList = dict[Vertex, Coordinates]
 
 
 class CoordinateSystem():
-    """
-    Dictionary of 'node:coordinate' pairs.
-    """
+    """ Dictionary of 'node:coordinate' pairs. """
 
     def __init__(self, bec: str) -> None:
+        self.bec = bec
         self.__x = 1
         self.__y = 1
         self.__moveset: list[Coordinates] = [
@@ -25,9 +24,9 @@ class CoordinateSystem():
             (-2 * self.__x, self.__y),   # 5, up-left
             (0, 2 * self.__y),           # 6, up
         ]
-        self.primary_coordinates: CoordinateList = {}  # primary nodes
+        self.primary_coordinates: CoordinateList = {}
         self.coordinates: CoordinateList = {}
-        self.__calculate_coordinates(bec)
+        self.__calculate_coordinates()
 
     def __move(self, node: Coordinates, move: Coordinates) -> Coordinates:
         """ Moves node to new coordinates specified by move (change of x and y) """
@@ -71,12 +70,22 @@ class CoordinateSystem():
 
         # TODO
 
+    def __sort_primary_nodes(self) -> tuple[list[Vertex], list[Coordinates]]:
+        """ Sort PN coordinates descending by y and ascending by x.
+
+        Returns two lists, one of sorted node ids and one of sorted node coordinates.
+        """
+        sorted_ids: list[Vertex]
+        sorted_coordinates: list[Coordinate] = []
+        sort_fun = lambda key: (-self.primary_coordinates[key][1], self.primary_coordinates[key][0])
+
+        sorted_ids = sorted(self.primary_coordinates, key=sort_fun, reverse=False)
+        [sorted_coordinates.append(self.primary_coordinates[sorted_ids[i]]) for i in range(len(sorted_ids))]
+
+        return sorted_ids, sorted_coordinates
+
     def __fill_me_up(self) -> None:
         """ Fills up the coordinate list with missing edges and vertices
-
-        Parameters:
-            `clst`: coordinate list for all nodes
-            `hclst`: coordinate list for all primary nodes
         ---
         The original list contains only vertices and edges that form the boundary.
         To fill up the system, it has to go through all primary nodes (check
@@ -121,20 +130,30 @@ class CoordinateSystem():
         x. When it reaches z, there is no neighbouring PN and no PN's left in this level,
         so it moves on to PN 4.
         """
-        # sort PN coordinates descending by y and ascending by x
+        sorted_ids, sorted_coordinates = self.__sort_primary_nodes()
         print("----------------------------------------------------------------")
-        sorted_coordinates = sorted(self.primary_coordinates,
-                                    key=lambda key: (-self.primary_coordinates[key][1],
-                                                     self.primary_coordinates[key][0]),
-                                    reverse=False)
-        print(sorted_coordinates)
-        sorted_dict = {}
-        for node_id in sorted_coordinates:
-            sorted_dict[node_id] = self.primary_coordinates[node_id]
         print("sorted PNs")
-        print(sorted_dict)
+        [print(sorted_ids[i], sorted_coordinates[i]) for i in range(len(sorted_ids))]
 
         # trace the hexagons PN's define and add any missing nodes/edges
+        # 1. it always starts with a primary node with at least one neighbour, so we trace immeadiatelly
+        # 2. checks if next primary node exists in this level
+        """
+        rotation = 0
+        current_node: tuple[Vertex, Coordinates] = (sorted_ids[0], sorted_coordinates[0])
+        for i in range(pn):
+            self.__trace_hexagon(current_node)  
+
+            try:
+                next_primary_node: tuple[Vertex, Coordinates] = (sorted_ids[i+1], sorted_coordinates[i+1]) # exception will happen here
+                # is it a neighbouring PN (x2==x1+4?)
+                if current_node[1][0] != next_primary_node[1][0] + 4:
+                    # is it in this level or not (y1==y2?)
+                    if current_node[1][1] == next_primary_node[1][1]:
+                        pass
+            except IndexError: # end of list, no more hexagons to add
+                break
+        """
         raise NotImplementedError
 
     def __next_rotation(self, rotation: int):
@@ -176,7 +195,7 @@ class CoordinateSystem():
             case _:
                 return rotation
 
-    def __calculate_coordinates(self, bec: str) -> CoordinateList:
+    def __calculate_coordinates(self) -> None:
         """ Calculates coordinates for all nodes.
 
         Coordinates take place in the standard x-y-axial coordinate system.
@@ -199,11 +218,10 @@ class CoordinateSystem():
         """
         rotation = 0  # starting rotation
         node_id: Vertex = 1  # starting node
-        start_coordinates: Coordinates = (0, 0)  # starting coordinates
-        self.coordinates: CoordinateList = {node_id: start_coordinates}  # starting position
-        self.primary_coordinates[node_id] = start_coordinates  # primary nodes
+        self.coordinates = {node_id: (0, 0)}  # starting position
+        self.primary_coordinates = {node_id: (0, 0)}  # primary nodes
 
-        for digit in bec:
+        for digit in self.bec:
             digit = int(digit)
             for _ in range(digit):
                 node_id += 1
@@ -213,7 +231,6 @@ class CoordinateSystem():
                 self.__add_from_coordinates(node_id, rotation, None)
 
                 rotation = self.__next_rotation(rotation)
-                start_coordinates = self.coordinates[node_id]
             rotation -= 2  # store next starting direction
 
         # pop the last coordinate (it shadows the first node)
@@ -223,6 +240,7 @@ class CoordinateSystem():
         print("===========================================================================")
         print("Coordinates:")
         pprint(self.coordinates)
+
         for id, coordinates in self.coordinates.items():
             if self.__is_primary(coordinates):
                 print(f"Found PN: {id}")
@@ -230,22 +248,28 @@ class CoordinateSystem():
 
         # add missing edges and nodes to the list
         self.__fill_me_up()
+
         print("---------------------------------------------------------------------------")
         print("PN coordinates:")
         pprint(self.primary_coordinates)
-        return self.coordinates
+        return
 
 
 class Benzy():
-    """
-    Creates a benzenoid system from a BEC that can be plotted.
-    """
+    """ Creates a benzenoid system from a BEC that can be plotted. """
 
     def __init__(self, bec: str) -> None:
         self.bec: str = self.check_bec(bec)
-        self.perimiter_nodes = sum([int(d) for d in self.bec])  # perimiter nodes
+        self.perimiter_nodes = sum([int(d) for d in self.bec])
         self.graph: Graph = self.__graph_from_bec()
         self.coordinates: CoordinateSystem = CoordinateSystem(self.bec)
+
+    def __graph_from_bec(self) -> Graph:
+        """ Creates a networkx graph.  """
+        g = Graph()
+        g.add_edges_from([(i, i + 1) for i in range(1, self.perimiter_nodes)])
+        g.add_edge(self.perimiter_nodes, 1)  # connect the graph
+        return g
 
     def draw_benzenoid_system(self) -> None:
         """ Plots the benzenoid system.  """
@@ -271,13 +295,6 @@ class Benzy():
             if int(d) == 6 or int(d) == 0:
                 raise ValueError("Illegal boundary edges code. Cannot contain 6 or 0")
         return bec
-
-    def __graph_from_bec(self) -> Graph:
-        """ Creates a networkx graph.  """
-        g = Graph()
-        g.add_edges_from([(i, i + 1) for i in range(1, self.perimiter_nodes)])
-        g.add_edge(self.perimiter_nodes, 1)  # connect the graph
-        return g
 
 
 if __name__ == "__main__":
