@@ -74,10 +74,6 @@ class CoordinateSystem():
     def __fill_me_up(self) -> None:
         """ Fills up the coordinate list with missing edges and vertices
 
-        Parameters:
-            `clst`: coordinate list for all nodes
-            `hclst`: coordinate list for all primary nodes
-        ---
         The original list contains only vertices and edges that form the boundary.
         To fill up the system, it has to go through all primary nodes (check
         @__is_primary for details) and draws the missing edges.
