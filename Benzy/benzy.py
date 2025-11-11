@@ -102,20 +102,28 @@ class CoordinateSystem():
 
     def __trace_hexagon(self, start_node: tuple[Vertex, Coordinates]) -> None:
         rotation = 0
+        print("= trace hexagon ================================================")
+        print(f"tracing from {start_node}")
         for _ in range(6):
             next_coordinates: Coordinates = self.__move(start_node[1], self.__moveset[rotation])
             next_node: Vertex = self.__get_node(next_coordinates)
 
             if self.__find_coordinate(next_coordinates):
                 if not self.__find_edge(start_node[0], next_node):
+                    print("----------------------------------------------------------------")
+                    print(f"adding edge: {(start_node[0], next_node)}")
                     self.__add_edge(start_node[0], next_node)
             else:
                 # create new node and new edge
+                print("----------------------------------------------------------------")
+                print(f"creating new node edge: {next_node}, {next_coordinates}")
                 self.__add_node(next_node)
                 self.__add_coordinate(next_node, rotation, start_node[1])
-                self.__add_edge(next_node, start_node[0])
+                print(f"adding edge: {(start_node[0], next_node)}")
+                self.__add_edge(start_node[0], next_node)
 
             start_node = (next_node, next_coordinates)
+            rotation = self.__next_rotation(rotation)
 
     def __fill_me_up(self) -> None:
         """ Fills up the coordinate list with missing edges and vertices
@@ -164,21 +172,27 @@ class CoordinateSystem():
         so it moves on to PN 4.
         """
         sorted_ids, sorted_coordinates = self.__sort_primary_nodes()
-        print("----------------------------------------------------------------")
+        print("= fill me up ===================================================")
         print("sorted PNs")
         _ = [print(sorted_ids[i], sorted_coordinates[i]) for i in range(len(sorted_ids))]
 
         for i in range(len(self.primary_coordinates)):
             # 1. get node from list of primary nodes
-            current_node: tuple[Vertex, Coordinates] = (sorted_ids[0], sorted_coordinates[0])
+            current_node: tuple[Vertex, Coordinates] = (sorted_ids[i], sorted_coordinates[i])
+            print("= fill me up - inner loop=======================================")
+            print(f"at PN {current_node}")
             try:
                 next_primary_node: tuple[Vertex, Coordinates] = (
                     sorted_ids[i + 1], sorted_coordinates[i + 1]
                 )
                 # 2. does a next PN exist in this level?
                 if current_node[1][1] == next_primary_node[1][1]:
+                    print("PN exists in level, starting trace")
                     self.__trace_hexagon(current_node)  # trace the hexagon and continue
+                else:
+                    print("PN doesn't exists in level, moving to next level")
             except IndexError:  # no more primary nodes
+                print("no more primary nodes")
                 break
 
     def __next_rotation(self, rotation: int):
@@ -301,8 +315,8 @@ class Benzy():
         nx.draw(
             G=self.coordinate_system.graph,
             pos=self.coordinate_system.coordinates,
-            with_labels=True,
-            node_size=700,
+            with_labels=False,
+            node_size=0,
             node_color="skyblue",
             font_weight="bold"
         )
