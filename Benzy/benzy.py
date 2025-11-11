@@ -338,7 +338,7 @@ class Benzy():
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: benzy.py [int | list[int]]""")
+        print("Usage: benzy.py [BEC | list BEC]""")
         print("Examples:", end=" ")
         for e in ["55", "2525", "333333", "444" "5312351231"]:
             print(e, end=" ")
