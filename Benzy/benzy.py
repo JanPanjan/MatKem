@@ -133,6 +133,45 @@ class Benzy():
 
         return sorted_ids, sorted_coordinates
 
+    def next_rotation(self, rotation: int):
+        """ Gets the next valid rotation, moving to the beginning/end of moveset if necessary.
+
+        The first calculated coordinate will always be done by an up-right move.
+        First calculated coordinate after a new digit is read will always be done
+        with a move 2 steps back in the moveset. E.g. first move is always up-right:
+
+                            (2,1)           (2,1)
+           (0,0) --1-> (0,0)      --2-> (0,0)    (4,0) --3-> ...
+
+        When the additions are consumed (e.g. 1 in BEC contributes to 1 addition), it resets
+        back 2 rotations, so that the next edge is added in the correct direction. Rotations
+        are periodical, which means that when it goes back from 1st rotation, it ends up at
+        the last rotation in the moveset. E.g.:
+
+            Digit: 1, rotations: [0, 1*], resets to 1-2 = -1 = 5
+
+                                (2,1)
+                (0,0) --1-> (0,0)
+
+            Digit: 2, rotations: [5, 0, 1*], resets to 1-2 = -1 = 5
+
+                                                      (3,3)
+                                (2,2)            (2,2)
+                (0,0) --1->           --2->
+                                (2,1)            (2,1)
+                           (0,0)            (0,0)
+
+            ...
+        """
+        rotation += 1
+        match rotation:
+            case 6:
+                return 0
+            case -1:
+                return 5
+            case _:
+                return rotation
+
     def trace_hexagon(self, start_node: tuple[Vertex, Coordinates]) -> None:
         rotation = 0
         print("= trace hexagon ================================================")
@@ -227,45 +266,6 @@ class Benzy():
             except IndexError:  # no more primary nodes
                 print("no more primary nodes")
                 break
-
-    def next_rotation(self, rotation: int):
-        """ Gets the next valid rotation, moving to the beginning/end of moveset if necessary.
-
-        The first calculated coordinate will always be done by an up-right move.
-        First calculated coordinate after a new digit is read will always be done
-        with a move 2 steps back in the moveset. E.g. first move is always up-right:
-
-                            (2,1)           (2,1)
-           (0,0) --1-> (0,0)      --2-> (0,0)    (4,0) --3-> ...
-
-        When the additions are consumed (e.g. 1 in BEC contributes to 1 addition), it resets
-        back 2 rotations, so that the next edge is added in the correct direction. Rotations
-        are periodical, which means that when it goes back from 1st rotation, it ends up at
-        the last rotation in the moveset. E.g.:
-
-            Digit: 1, rotations: [0, 1*], resets to 1-2 = -1 = 5
-
-                                (2,1)
-                (0,0) --1-> (0,0)
-
-            Digit: 2, rotations: [5, 0, 1*], resets to 1-2 = -1 = 5
-
-                                                      (3,3)
-                                (2,2)            (2,2)
-                (0,0) --1->           --2->
-                                (2,1)            (2,1)
-                           (0,0)            (0,0)
-
-            ...
-        """
-        rotation += 1
-        match rotation:
-            case 6:
-                return 0
-            case -1:
-                return 5
-            case _:
-                return rotation
 
     def calculate_coordinates(self) -> None:
         """ Calculates coordinates for all nodes.
