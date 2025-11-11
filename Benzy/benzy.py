@@ -42,8 +42,8 @@ class Benzy():
         nx.draw(
             G=self.graph,
             pos=self.coordinates,
-            with_labels=False,
-            node_size=0,
+            with_labels=True,
+            node_size=700,
             node_color="skyblue",
             font_weight="bold"
         )
@@ -63,10 +63,17 @@ class Benzy():
         return bec
 
     def get_node(self, coordinates: Coordinates) -> Vertex:
+        print()
+        print(" == get-node =================================================")
+        print(f"searching for {coordinates}")
+
         for node in self.coordinates.items():
+            print(f"  {node}")
             if node[1] == coordinates:
+                print(f"  found node {node[0]}")
                 return node[0]
-        return -1  # hmm
+        print()
+        return list(self.coordinates.keys())[-1] + 1  # return next possible node id
 
     def move(self, node: Coordinates, move: Coordinates) -> Coordinates:
         """ Moves node to new coordinates specified by move (change of x and y) """
@@ -112,13 +119,13 @@ class Benzy():
         """
         return node[0] % 2 == 0 and node[1] % 3 == 0 and self.find_coordinate((node[0], node[1] - 2))
 
-    def sort_primary_nodes(self) -> tuple[list[Vertex], list[Coordinates]]:
-        """ Sort PN coordinates descending by y and ascending by x.
+    def is_inner_primary(self, node: Coordinates) -> bool:
+        return self.find_coordinate(self.move(node, (-2 * self.x_step, self.y_step)))
 
-        Returns two lists, one of sorted node ids and one of sorted node coordinates.
-        """
+    def sort_primary_nodes(self) -> None:
+        """ Sort PN coordinates descending by y and ascending by x. """
         sorted_ids: list[Vertex]
-        sorted_coordinates: list[Coordinates] = []
+        sorted_coordinates: dict[Vertex, Coordinates] = {}
 
         sorted_ids = sorted(
             self.primary_coordinates,
@@ -129,9 +136,9 @@ class Benzy():
             reverse=False
         )
         for node_id in sorted_ids:
-            sorted_coordinates.append(self.primary_coordinates[node_id])
+            sorted_coordinates[node_id] = self.primary_coordinates[node_id]
 
-        return sorted_ids, sorted_coordinates
+        self.primary_coordinates = sorted_coordinates
 
     def next_rotation(self, rotation: int):
         """ Gets the next valid rotation, moving to the beginning/end of moveset if necessary.
@@ -172,30 +179,43 @@ class Benzy():
             case _:
                 return rotation
 
+    # BUG: primary nodes should also be added during tracing when encountered
     def trace_hexagon(self, start_node: tuple[Vertex, Coordinates]) -> None:
-        rotation = 0
-        print("= trace hexagon ================================================")
+        print()
+        print("===== trace hexagon =========================================")
+        print("=============================================================")
         print(f"tracing from {start_node}")
+
+        rotation = 0
+        current_node = start_node
         for _ in range(6):
-            next_coordinates: Coordinates = self.move(start_node[1], self.moveset[rotation])
+            next_coordinates: Coordinates = self.move(current_node[1], self.moveset[rotation])
             next_node: Vertex = self.get_node(next_coordinates)
 
             if self.find_coordinate(next_coordinates):
-                if not self.find_edge(start_node[0], next_node):
+                if not self.find_edge(current_node[0], next_node):
                     print("----------------------------------------------------------------")
-                    print(f"adding edge: {(start_node[0], next_node)}")
-                    self.add_edge(start_node[0], next_node)
+                    print(f"adding edge: {(current_node[0], next_node)}")
+                    self.add_edge(current_node[0], next_node)
+                    print("----------------------------------------------------------------")
             else:
                 # create new node and new edge
                 print("----------------------------------------------------------------")
                 print(f"creating new node edge: {next_node}, {next_coordinates}")
                 self.add_node(next_node)
-                self.add_coordinate(next_node, rotation, start_node[1])
-                print(f"adding edge: {(start_node[0], next_node)}")
-                self.add_edge(start_node[0], next_node)
+                self.add_coordinate(next_node, rotation, current_node[1])
+                print(f"adding edge: {(current_node[0], next_node)}")
+                self.add_edge(current_node[0], next_node)
+                print("----------------------------------------------------------------")
 
-            start_node = (next_node, next_coordinates)
+                # BUG
+                if self.is_inner_primary(next_coordinates):
+                    self.primary_coordinates[next_node] = next_coordinates
+                    self.sort_primary_nodes()
+
+            current_node = (next_node, next_coordinates)
             rotation = self.next_rotation(rotation)
+        print()
 
     def fill_me_up(self) -> None:
         """ Fills up the coordinate list with missing edges and vertices
@@ -243,20 +263,29 @@ class Benzy():
         x. When it reaches z, there is no neighbouring PN and no PN's left in this level,
         so it moves on to PN 4.
         """
-        sorted_ids, sorted_coordinates = self.sort_primary_nodes()
-        print("= fill me up ===================================================")
+        self.sort_primary_nodes()
+        print()
+        print("=============================================================")
+        print("===== fill me up ============================================")
+        print("=============================================================")
         print("sorted PNs")
-        _ = [print(sorted_ids[i], sorted_coordinates[i]) for i in range(len(sorted_ids))]
+        pprint(self.primary_coordinates)
+        print()
+
+        # BUG: when new primary nodes are added from trace function, this for loop does
+        # not update, meaning the range is calculated before iterating starts. After addition
+        # new length of list is not calculated.
+        # NOTE: Could solve with a while loop and a queue.
 
         for i in range(len(self.primary_coordinates)):
             # 1. get node from list of primary nodes
-            current_node: tuple[Vertex, Coordinates] = (sorted_ids[i], sorted_coordinates[i])
-            print("= fill me up - inner loop=======================================")
-            print(f"at PN {current_node}")
+            current_node: tuple[Vertex, Coordinates] = list(self.primary_coordinates.items())[i]
+            print(f"---------at PN {current_node} ---------------------")
             try:
-                next_primary_node: tuple[Vertex, Coordinates] = (
-                    sorted_ids[i + 1], sorted_coordinates[i + 1]
-                )
+                next_primary_node: tuple[Vertex, Coordinates] = list(
+                    self.primary_coordinates.items())[i + 1]
+                print(f"next PN: {next_primary_node}")
+
                 # 2. does a next PN exist in this level?
                 if current_node[1][1] == next_primary_node[1][1]:
                     print("PN exists in level, starting trace")
