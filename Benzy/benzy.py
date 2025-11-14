@@ -1,4 +1,3 @@
-import sys
 import math
 from pprint import pprint
 from networkx import Graph
@@ -81,7 +80,7 @@ class Benzy():
                 print(f"  found node {list_node[0]}")
                 return list_node[1]
         else:
-            return (math.inf, math.inf) # hm
+            return (math.inf, math.inf)  # hm
 
     def get_node(self, coordinates: Coordinates) -> Vertex:
         print()
@@ -100,9 +99,9 @@ class Benzy():
         return (node[0] + move[0], node[1] + move[1])
 
     def add_coordinates(self,
-                       node_id: Vertex,
-                       rotation: int,
-                       predecessor: None | Coordinates = None) -> None:
+                        node_id: Vertex,
+                        rotation: int,
+                        predecessor: None | Coordinates = None) -> None:
         """ Adds new coordinate to coordinate list, based on previous node and move step.  """
         if predecessor is None:  # predecessor
             predecessor = self.coordinates[node_id - 1]
@@ -151,7 +150,6 @@ class Benzy():
         )
         pprint(sorted_list)
         self.primary_coordinates = sorted_list
-        pprint(sorted_list)
 
     def next_rotation(self, rotation: int):
         """ Gets the next valid rotation, moving to the beginning/end of moveset if necessary.
@@ -222,7 +220,7 @@ class Benzy():
 
                 if self.is_inner_primary(next_coordinates):
                     self.primary_coordinates.insert(0, (next_node, next_coordinates))
-                    self.sort_primary_nodes() # is this needed?
+                    self.sort_primary_nodes()  # is this needed?
 
             current_node = (next_node, next_coordinates)
             rotation = self.next_rotation(rotation)
@@ -290,7 +288,7 @@ class Benzy():
 
             # 2. does a next PN exist in this level?
             try:
-                # exception will happen here, but won't this get caught by loop condition?
+                # exception will happen here
                 next_primary_node: GraphItem = self.primary_coordinates[0]
                 print(f"next PN: {next_primary_node}")
 
@@ -333,8 +331,7 @@ class Benzy():
             digit = int(digit)
             for _ in range(digit):
                 node_id += 1
-                print(f"digit: {digit}  node id: {node_id}  rotation: {
-                      rotation}, move: {self.moveset[rotation]}")
+                print(f"digit: {digit}, node id: {node_id}, rotation: {rotation}, move: {self.moveset[rotation]}")
 
                 self.add_coordinates(node_id, rotation, None)
 
