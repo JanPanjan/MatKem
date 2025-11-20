@@ -1,4 +1,5 @@
 import math
+import sys
 from pprint import pprint
 from networkx import Graph
 import networkx as nx
@@ -226,6 +227,7 @@ class Benzy():
             rotation = self.next_rotation(rotation)
         print()
 
+    # BUG: for example 3233321112523242211122
     def fill_me_up(self) -> None:
         """ Fills up the coordinate list with missing edges and vertices
         ---
@@ -282,7 +284,9 @@ class Benzy():
         print()
 
         i = 0
-        while self.primary_coordinates is not []:
+        # t = 0
+        while self.primary_coordinates is not []: #and t != 1:
+            # t += 1
             # 1. get node from list of primary nodes
             current_node: GraphItem = self.primary_coordinates.pop(0)
 
@@ -352,7 +356,7 @@ class Benzy():
                 self.primary_coordinates.append((node_id, coordinates))
 
         # add missing edges and nodes to the list
-        self.fill_me_up()
+        # self.fill_me_up()
         print("-----------------------------------------------------------------")
 
 
