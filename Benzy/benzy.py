@@ -12,17 +12,18 @@ CoordinateDict = dict[Vertex, Coordinates]
 CoordinateList = list[GraphItem]
 
 
-class Benzy():
-    """ Creates a benzenoid system from a BEC that can be plotted. """
+class Benzy:
+    """Creates a benzenoid system from a BEC that can be plotted."""
+
     x_step = 1
     y_step = 1
     moveset: list[Coordinates] = [
-        (2 * x_step, y_step),    # 1, up-right
-        (2 * x_step, -y_step),   # 2, down-right
-        (0, -2 * y_step),        # 3, down
+        (2 * x_step, y_step),  # 1, up-right
+        (2 * x_step, -y_step),  # 2, down-right
+        (0, -2 * y_step),  # 3, down
         (-2 * x_step, -y_step),  # 4, down-left
-        (-2 * x_step, y_step),   # 5, up-left
-        (0, 2 * y_step),         # 6, up
+        (-2 * x_step, y_step),  # 5, up-left
+        (0, 2 * y_step),  # 6, up
     ]
 
     def __init__(self, bec: str) -> None:
@@ -39,27 +40,27 @@ class Benzy():
         self.calculate_coordinates()
 
     def graph_from_bec(self) -> Graph:
-        """ Creates a networkx graph.  """
+        """Creates a networkx graph."""
         g = Graph()
         g.add_edges_from([(i, i + 1) for i in range(1, self.perimiter_nodes)])
         g.add_edge(self.perimiter_nodes, 1)  # connect the graph
         return g
 
     def draw_benzenoid_system(self) -> None:
-        """ Plots the benzenoid system.  """
+        """Plots the benzenoid system."""
         nx.draw(
             G=self.graph,
             pos=self.coordinates,
-            with_labels=False,
-            node_size=0,
+            with_labels=True,
+            node_size=700,
             node_color="skyblue",
-            font_weight="bold"
+            font_weight="bold",
         )
         plt.title(f"Benzenoid system of {self.bec}")
         plt.show()
 
     def check_bec(self, bec: str) -> str:
-        """ Makes sure that the provided BEC is valid.
+        """Makes sure that the provided BEC is valid.
 
         Valid BEC is composed only of numbers between 1-5.
         """
@@ -71,39 +72,40 @@ class Benzy():
         return bec
 
     def get_coordinates(self, node: Vertex) -> Coordinates:
-        print()
-        print(" == get-coordinates =================================================")
-        print(f"searching for {node}")
+        print(f"getting {node} coordinates ...", end="")
 
         for list_node in self.coordinates.items():
-            print(f"  {list_node}")
+            print(f"{list_node},", end=" ")
             if list_node[0] == node:
-                print(f"  found node {list_node[0]}")
+                print(f"found node {list_node[0]}", end="\n")
                 return list_node[1]
         else:
+            print()
             return (math.inf, math.inf)  # hm
 
-    def get_node(self, coordinates: Coordinates) -> Vertex:
-        print()
-        print(" == get-node =================================================")
-        print(f"searching for {coordinates}")
+    def get_node(self, coordinates: Coordinates, strict=False) -> Vertex | None:
+        print(f"searching for {coordinates} ... ", end="")
 
         for node in self.coordinates.items():
             if node[1] == coordinates:
-                print(f"  found node {node[0]}")
+                print(f"found node {node[0]}", end="\n")
                 return node[0]
         else:
-            return list(self.coordinates.keys())[-1] + 1  # return next possible node id
+            print()
+            if not strict:
+                return list(self.coordinates.keys())[-1] + 1  # return next possible node id
+            else:
+                return (math.inf, math.inf)
 
     def move(self, node: Coordinates, move: Coordinates) -> Coordinates:
-        """ Moves node to new coordinates specified by move (change of x and y) """
+        """Moves node to new coordinates specified by move (change of x and y)"""
         return (node[0] + move[0], node[1] + move[1])
 
-    def add_coordinates(self,
-                        node_id: Vertex,
+    def add_coordinates(self, 
+                        node_id: Vertex, 
                         rotation: int,
                         predecessor: None | Coordinates = None) -> None:
-        """ Adds new coordinate to coordinate list, based on previous node and move step.  """
+        """Adds new coordinate to coordinate list, based on previous node and move step."""
         if predecessor is None:  # predecessor
             predecessor = self.coordinates[node_id - 1]
         move: Coordinates = self.moveset[rotation]
@@ -120,10 +122,39 @@ class Benzy():
         return node in self.coordinates.values()
 
     def find_edge(self, u: Vertex, v: Vertex) -> bool:
-        return (u, v) in self.graph.edges()
+        print()
+        print(f"searching edge for {u} and {v}... ", end="")
+        if self.graph.has_edge(u, v):
+            print("found edge")
+            return True
+        else:
+            return False
+
+    # NOTE: how tf določim kateri so levi in kateri desni...
+    def boundary_primary_type(self, node: Coordinates) -> str:
+        """ Finds out if the boundary primary node belongs to the left or right side of the boundary. """
+        print()
+        print(f"checking type for {node}...")
+
+        node_id: Vertex = self.get_node(node, strict=True)
+        left: Vertex = self.get_node(self.move(node, (-2, 1)), strict=True)
+        right: Vertex = self.get_node(self.move(node, (2, 1)), strict=True)
+
+        print(f"left: {left}")
+        print(f"right: {right}")
+
+        if self.find_edge(node_id, left): 
+            print("has left edge")
+            return "right"
+        elif self.find_edge(node_id, right): 
+            print("has right edge")
+            return "left"
+        else:
+            print("has no edge")
+            return "none"
 
     def is_primary(self, node: Coordinates) -> bool:
-        """ Checks is the given node fits the criteria for a primary node.
+        """Checks is the given node fits the criteria for a primary node.
 
         Primary nodes (denoted as PN) are nodes that fit 3 criteria:
         (1) their x-coordinate is divisible by 2 and
@@ -137,23 +168,26 @@ class Benzy():
                           (2,-3)
 
         """
-        return node[0] % 2 == 0 and node[1] % 3 == 0 and self.find_coordinates((node[0], node[1] - 2))
+        return (
+            node[0] % 2 == 0
+            and node[1] % 3 == 0
+            and self.find_coordinates((node[0], node[1] - 2))
+        )
 
     def is_inner_primary(self, node: Coordinates) -> bool:
         return self.find_coordinates(self.move(node, (-2 * self.x_step, self.y_step)))
 
     def sort_primary_nodes(self) -> None:
-        """ Sort PN coordinates descending by y and ascending by x. """
+        """Sort PN coordinates descending by y and ascending by x."""
         sorted_list: list[Vertex] = sorted(
             self.primary_coordinates,
             key=lambda item: (-item[1][1], item[1][0]),
-            reverse=False
+            reverse=False,
         )
-        pprint(sorted_list)
         self.primary_coordinates = sorted_list
 
     def next_rotation(self, rotation: int):
-        """ Gets the next valid rotation, moving to the beginning/end of moveset if necessary.
+        """Gets the next valid rotation, moving to the beginning/end of moveset if necessary.
 
         The first calculated coordinate will always be done by an up-right move.
         First calculated coordinate after a new digit is read will always be done
@@ -193,31 +227,27 @@ class Benzy():
 
     def trace_hexagon(self, start_node: GraphItem) -> None:
         print()
-        print("===== trace hexagon =========================================")
-        print("=============================================================")
         print(f"tracing from {start_node}")
 
         rotation = 0
         current_node = start_node
         for _ in range(6):
-            next_coordinates: Coordinates = self.move(current_node[1], self.moveset[rotation])
+            next_coordinates: Coordinates = self.move(
+                current_node[1], self.moveset[rotation]
+            )
             next_node: Vertex = self.get_node(next_coordinates)
 
             if self.find_coordinates(next_coordinates):
                 if not self.find_edge(current_node[0], next_node):
-                    print("----------------------------------------------------------------")
-                    print(f"adding edge: {(current_node[0], next_node)}")
+                    print(f"* adding edge: {(current_node[0], next_node)}")
                     self.add_edge(current_node[0], next_node)
-                    print("----------------------------------------------------------------")
             else:
                 # create new node and new edge
-                print("----------------------------------------------------------------")
-                print(f"creating new node edge: {next_node}, {next_coordinates}")
+                print(f"* creating new node edge: {next_node}, {next_coordinates}")
                 self.add_node(next_node)
                 self.add_coordinates(next_node, rotation, current_node[1])
-                print(f"adding edge: {(current_node[0], next_node)}")
+                print(f"* adding edge: {(current_node[0], next_node)}")
                 self.add_edge(current_node[0], next_node)
-                print("----------------------------------------------------------------")
 
                 if self.is_inner_primary(next_coordinates):
                     self.primary_coordinates.insert(0, (next_node, next_coordinates))
@@ -229,7 +259,7 @@ class Benzy():
 
     # BUG: for example 3233321112523242211122
     def fill_me_up(self) -> None:
-        """ Fills up the coordinate list with missing edges and vertices
+        """Fills up the coordinate list with missing edges and vertices
         ---
         The original list contains only vertices and edges that form the boundary.
         To fill up the system, it has to go through all primary nodes (check
@@ -276,16 +306,13 @@ class Benzy():
         """
         self.sort_primary_nodes()
         print()
-        print("=============================================================")
-        print("===== fill me up ============================================")
-        print("=============================================================")
         print("sorted PNs")
         pprint(self.primary_coordinates)
         print()
 
         i = 0
         # t = 0
-        while self.primary_coordinates is not []: #and t != 1:
+        while self.primary_coordinates is not []:  # and t != 1:
             # t += 1
             # 1. get node from list of primary nodes
             current_node: GraphItem = self.primary_coordinates.pop(0)
@@ -306,7 +333,7 @@ class Benzy():
                 break
 
     def calculate_coordinates(self) -> None:
-        """ Calculates coordinates for all nodes.
+        """Calculates coordinates for all nodes.
 
         Coordinates take place in the standard x-y-axial coordinate system.
         Each hexagon is composed of 6 coordinates. They follow the @self.moveset
@@ -328,8 +355,8 @@ class Benzy():
         """
         rotation = 0  # starting rotation
         node_id: Vertex = 1  # starting node
-        self.coordinates = {node_id: (0, 0)}  # starting position
-        self.primary_coordinates.append((node_id, (0, 0)))  # primary nodes
+        self.coordinates: CoordinateDict = {node_id: (0, 0)}  # starting position
+        self.primary_coordinates: CoordinateList = [] # primary nodes
 
         for digit in self.bec:
             digit = int(digit)
@@ -345,26 +372,29 @@ class Benzy():
         # pop the last coordinate (it shadows the first node)
         self.coordinates.pop(len(self.coordinates))
 
-        # traverse the coordinates again and find primary nodes on the boundary
-        print("===========================================================================")
-        print("Coordinates:")
-        pprint(self.coordinates)
+        print("\nEdges:")
+        pprint(list(self.graph.edges()))
+        print()
 
+        # traverse the coordinates again and find primary nodes on the boundary
         for node_id, coordinates in self.coordinates.items():
             if self.is_primary(coordinates):
-                print(f"Found PN: {node_id}")
-                self.primary_coordinates.append((node_id, coordinates))
+                print()
+                print(node_id, end=", ")
+                node_type: str = self.boundary_primary_type(coordinates)
+                self.primary_coordinates.append((node_id, coordinates, node_type))
+        print()
 
+        pprint(self.primary_coordinates)
         # add missing edges and nodes to the list
         # self.fill_me_up()
-        print("-----------------------------------------------------------------")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: benzy.py [BEC | list BEC]""")
+        print("Usage: benzy.py [BEC | list BEC]")
         print("Examples:", end=" ")
-        for e in ["55", "2525", "333333", "444" "5312351231", "323232323232"]:
+        for e in ["55", "2525", "333333", "4445312351231", "323232323232"]:
             print(e, end=" ")
         print()
 
