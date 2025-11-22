@@ -6,10 +6,18 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 Coordinates = tuple[int, int]
-Vertex = int
-GraphItem = tuple[Vertex, Coordinates]
-CoordinateDict = dict[Vertex, Coordinates]
-CoordinateList = list[GraphItem]
+
+
+class Vertex():
+    def __init__(self, vx_id: int, coordinates: Coordinates, vx_type: str | None = None) -> None:
+        self.id: int = vx_id
+        self.type: str | None = vx_type
+        self.x: int = coordinates[0]
+        self.y: int = coordinates[1]
+
+    def move(self, move_step: Coordinates) -> Coordinates:
+        """ Moves vertex to new coordinates. """
+        return (self.x + move_step[0], self.y + move_step[1])
 
 
 class Benzy:
@@ -26,31 +34,31 @@ class Benzy:
         (0, 2 * y_step),  # 6, up
     ]
 
+    # NOTE: is it really necessary to work with 2 lists of vertices?
+    # Just use @self.coordinates and create functions for searching
+    # for primary vertices
+    primary_vertices: list[Vertex] = []
+    vertices: list[Vertex] = []
+
     def __init__(self, bec: str) -> None:
         self.bec: str = self.check_bec(bec)
-        self.perimiter_nodes: int = sum(int(d) for d in self.bec)
+        self.perimiter_vertices: int = sum(int(d) for d in self.bec)
         self.graph: Graph = self.graph_from_bec()
-
-        # NOTE: is it really necessary to work with 2 lists of nodes?
-        # Just use @self.coordinates and create functions for searching
-        # for primary nodes
-        self.primary_coordinates: CoordinateList = []
-        self.coordinates: CoordinateDict = {}
-
         self.calculate_coordinates()
+        self.coordinates: list[Coordinates] = self.get_coordinates()
 
     def graph_from_bec(self) -> Graph:
         """Creates a networkx graph."""
         g = Graph()
-        g.add_edges_from([(i, i + 1) for i in range(1, self.perimiter_nodes)])
-        g.add_edge(self.perimiter_nodes, 1)  # connect the graph
+        g.add_edges_from([(i, i + 1) for i in range(1, self.perimiter_vertices)])
+        g.add_edge(self.perimiter_vertices, 1)  # connect the graph
         return g
 
     def draw_benzenoid_system(self) -> None:
         """Plots the benzenoid system."""
         nx.draw(
             G=self.graph,
-            pos=self.coordinates,
+            pos={vx.id: (vx.x, vx.y) for vx in self.vertices},  # needs a dict
             with_labels=True,
             node_size=700,
             node_color="skyblue",
@@ -71,95 +79,65 @@ class Benzy:
                 raise ValueError("Illegal boundary edges code. Cannot contain 6 or 0")
         return bec
 
-    def get_coordinates(self, node: Vertex) -> Coordinates:
-        print(f"getting {node} coordinates ...", end="")
+    def get_vertex_id(self, coordinates: Coordinates, strict=False) -> int | None:
+        """ Finds vertex with given coordinates. """
 
-        for list_node in self.coordinates.items():
-            print(f"{list_node},", end=" ")
-            if list_node[0] == node:
-                print(f"found node {list_node[0]}", end="\n")
-                return list_node[1]
-        else:
-            print()
-            return (math.inf, math.inf)  # hm
-
-    def get_node(self, coordinates: Coordinates, strict=False) -> Vertex | None:
         print(f"searching for {coordinates} ... ", end="")
+        for vx in self.vertices:
+            if (vx.x, vx.y) == coordinates:
+                print(f"found vertex {vx.id}", end="\n")
+                return vx.id
 
-        for node in self.coordinates.items():
-            if node[1] == coordinates:
-                print(f"found node {node[0]}", end="\n")
-                return node[0]
+        print()
+        if not strict:
+            vx = self.vertices[len(self.vertices) - 1]
+            return vx.id + 1  # return next possible vertice id
         else:
-            print()
-            if not strict:
-                return list(self.coordinates.keys())[-1] + 1  # return next possible node id
-            else:
-                return (math.inf, math.inf)
+            return (math.inf, math.inf)
 
-    def move(self, node: Coordinates, move: Coordinates) -> Coordinates:
-        """Moves node to new coordinates specified by move (change of x and y)"""
-        return (node[0] + move[0], node[1] + move[1])
+    def get_vertex(self, coordinates: Coordinates) -> Vertex | None:
+        for vx in self.vertices:
+            if (vx.x, vx.y) == coordinates:
+                return vx
+        return None
 
-    def add_coordinates(self, 
-                        node_id: Vertex, 
-                        rotation: int,
-                        predecessor: None | Coordinates = None) -> None:
-        """Adds new coordinate to coordinate list, based on previous node and move step."""
-        if predecessor is None:  # predecessor
-            predecessor = self.coordinates[node_id - 1]
-        move: Coordinates = self.moveset[rotation]
-        new_crd: Coordinates = self.move(predecessor, move)
-        self.coordinates[node_id] = new_crd
+    def get_coordinates(self) -> list[Coordinates]:
+        lst = [(vx.x, vx.y) for vx in self.vertices]
+        return lst
 
-    def add_node(self, node: Vertex) -> None:
-        self.graph.add_node(node)
+    def add_vertex(self,
+                   new_id: int,
+                   rotation: int,
+                   predecessor: Vertex | None = None) -> None:
+        """ Adds new coordinates to system coordinate dictionary. """
+        if predecessor is None:
+            predecessor = self.vertices[new_id - 1]
+        move_step: Coordinates = self.moveset[rotation]
+        new_crd: Coordinates = predecessor.move(move_step)
+        new_vx: Vertex = Vertex(new_id, new_crd)
+        self.vertices.append(new_vx)
 
-    def add_edge(self, u: Vertex, v: Vertex) -> None:
-        self.graph.add_edge(u, v)
-
-    def find_coordinates(self, node: Coordinates) -> bool:
-        return node in self.coordinates.values()
+    def find_coordinates(self, coordinates: Coordinates) -> bool:
+        for vx in self.vertices:
+            if coordinates == (vx.x, vx.y):
+                return True
+        return False
 
     def find_edge(self, u: Vertex, v: Vertex) -> bool:
-        print()
-        print(f"searching edge for {u} and {v}... ", end="")
-        if self.graph.has_edge(u, v):
+        print(f"\nSearching edge for {u.id} and {v.id}... ", end="")
+        if self.graph.has_edge(u.id, v.id):
             print("found edge")
             return True
         else:
             return False
 
-    # NOTE: how tf določim kateri so levi in kateri desni...
-    def boundary_primary_type(self, node: Coordinates) -> str:
-        """ Finds out if the boundary primary node belongs to the left or right side of the boundary. """
-        print()
-        print(f"checking type for {node}...")
+    def is_primary(self, vx: Vertex) -> bool:
+        """Checks is the given vertex fits the criteria for a primary vertex.
 
-        node_id: Vertex = self.get_node(node, strict=True)
-        left: Vertex = self.get_node(self.move(node, (-2, 1)), strict=True)
-        right: Vertex = self.get_node(self.move(node, (2, 1)), strict=True)
-
-        print(f"left: {left}")
-        print(f"right: {right}")
-
-        if self.find_edge(node_id, left): 
-            print("has left edge")
-            return "right"
-        elif self.find_edge(node_id, right): 
-            print("has right edge")
-            return "left"
-        else:
-            print("has no edge")
-            return "none"
-
-    def is_primary(self, node: Coordinates) -> bool:
-        """Checks is the given node fits the criteria for a primary node.
-
-        Primary nodes (denoted as PN) are nodes that fit 3 criteria:
+        Primary vertices (denoted as PN) are vertices that fit 3 criteria:
         (1) their x-coordinate is divisible by 2 and
         (2) their y-coordinate is divisible by 3 and
-        (3) there is a node immeadiatelly below them (i.e. (x,y-2))
+        (3) there is a vertex immeadiatelly below them (i.e. (x,y-2))
 
                           (2,1)
             this --> (0,0)     (4,0) <-- this
@@ -169,22 +147,31 @@ class Benzy:
 
         """
         return (
-            node[0] % 2 == 0
-            and node[1] % 3 == 0
-            and self.find_coordinates((node[0], node[1] - 2))
+            vx.x % 2 == 0
+            and vx.y % 3 == 0
+            and self.find_coordinates((vx.x, vx.y - 2))
         )
 
-    def is_inner_primary(self, node: Coordinates) -> bool:
-        return self.find_coordinates(self.move(node, (-2 * self.x_step, self.y_step)))
+    def is_inner_primary(self, vx: Vertex) -> bool:
+        move_step: Coordinates = (-2 * self.x_step, self.y_step)
+        return self.find_coordinates(vx.move(move_step))
 
-    def sort_primary_nodes(self) -> None:
+    def sort_primary_vertices(self) -> None:
         """Sort PN coordinates descending by y and ascending by x."""
-        sorted_list: list[Vertex] = sorted(
-            self.primary_coordinates,
-            key=lambda item: (-item[1][1], item[1][0]),
-            reverse=False,
-        )
-        self.primary_coordinates = sorted_list
+        n = len(self.primary_vertices)
+        for i in range(n):
+            for j in range(i + 1, n):
+                # descending by y, when y are different
+                if self.primary_vertices[i].y < self.primary_vertices[j].y:
+                    tmp = self.primary_vertices[i]
+                    self.primary_vertices[i] = self.primary_vertices[j]
+                    self.primary_vertices[j] = tmp
+                # ascending by x, when y are the same
+                elif self.primary_vertices[i].y == self.primary_vertices[j].y:
+                    if self.primary_vertices[i].x > self.primary_vertices[j].x:
+                        tmp = self.primary_vertices[i]
+                        self.primary_vertices[i] = self.primary_vertices[j]
+                        self.primary_vertices[j] = tmp
 
     def next_rotation(self, rotation: int):
         """Gets the next valid rotation, moving to the beginning/end of moveset if necessary.
@@ -225,48 +212,46 @@ class Benzy:
             case _:
                 return rotation
 
-    def trace_hexagon(self, start_node: GraphItem) -> None:
-        print()
-        print(f"tracing from {start_node}")
+    def trace_hexagon(self, start_vx: Vertex) -> None:
+        print(f"\nTracing from {start_vx.id}")
 
         rotation = 0
-        current_node = start_node
+        cur_vx: Vertex = start_vx
+
         for _ in range(6):
-            next_coordinates: Coordinates = self.move(
-                current_node[1], self.moveset[rotation]
-            )
-            next_node: Vertex = self.get_node(next_coordinates)
+            next_coordinates: Coordinates = cur_vx.move(self.moveset[rotation])
+            next_id: int = self.get_vertex_id(next_coordinates)
+            next_vx: Vertex = Vertex(next_id, next_coordinates)
 
             if self.find_coordinates(next_coordinates):
-                if not self.find_edge(current_node[0], next_node):
-                    print(f"* adding edge: {(current_node[0], next_node)}")
-                    self.add_edge(current_node[0], next_node)
+                if not self.find_edge(cur_vx, next_vx):
+                    print(f"* adding edge: {cur_vx.id, next_vx.id}")
+                    self.graph.add_edge(cur_vx.id, next_vx.id)
             else:
-                # create new node and new edge
-                print(f"* creating new node edge: {next_node}, {next_coordinates}")
-                self.add_node(next_node)
-                self.add_coordinates(next_node, rotation, current_node[1])
-                print(f"* adding edge: {(current_node[0], next_node)}")
-                self.add_edge(current_node[0], next_node)
+                # create new vertex and new edge
+                print(f"* creating new vertex for {next_vx.id} {next_coordinates}")
+                self.graph.add_node(next_id)
+                self.add_vertex(next_vx, rotation, cur_vx)
+                print(f"* adding edge: {(cur_vx.id, next_vx.id)}")
+                self.graph.add_edge(cur_vx.id, next_vx.id)
 
-                if self.is_inner_primary(next_coordinates):
-                    self.primary_coordinates.insert(0, (next_node, next_coordinates))
-                    self.sort_primary_nodes()  # is this needed?
+                if self.is_inner_primary(next_vx):
+                    self.primary_vertices.insert(0, next_vx)
+                    self.sort_primary_vertices()  # is this needed?
 
-            current_node = (next_node, next_coordinates)
+            cur_vx = next_vx
             rotation = self.next_rotation(rotation)
-        print()
 
     # BUG: for example 3233321112523242211122
     def fill_me_up(self) -> None:
         """Fills up the coordinate list with missing edges and vertices
         ---
         The original list contains only vertices and edges that form the boundary.
-        To fill up the system, it has to go through all primary nodes (check
+        To fill up the system, it has to go through all primary vertices (check
         @__is_primary for details) and draws the missing edges.
 
         The algorithm moves through all levels from top left-most to bottom right-most
-        primary node. E.g.:
+        primary vertex. E.g.:
 
                              ×
             from this --> ×     ×
@@ -298,42 +283,51 @@ class Benzy:
                        ×     ×     ×     ×     ×     ×      ×     ×
                           ×     ×     ×     ×     ×     ×      ×
 
-        Node 1 has 2 as it's neighbouring PN, so the hexagon is traced and any missing
+        Vertex 1 has 2 as it's neighbouring PN, so the hexagon is traced and any missing
         edges drawn. Moving onto 2, it's neighbouring PN is 3, so the procedure repeats.
         3 has no neighbouring PN, but the list still contains x, y and z, so it moves to
         x. When it reaches z, there is no neighbouring PN and no PN's left in this level,
         so it moves on to PN 4.
-        """
-        self.sort_primary_nodes()
-        print()
-        print("sorted PNs")
-        pprint(self.primary_coordinates)
-        print()
 
-        i = 0
-        # t = 0
-        while self.primary_coordinates is not []:  # and t != 1:
-            # t += 1
-            # 1. get node from list of primary nodes
-            current_node: GraphItem = self.primary_coordinates.pop(0)
+        Vertex type is important for determining if boundary primary vertices should be traced.
+        If it's between immeadiate left and right types, it should, otherwise not. E.g.:
+
+                   ×           ×
+                1     2     3     4
+                |     |     |     |
+                ×     ×     ×     ×
+                   ×     ×     ×
+                      ...  ...  ...
+
+        """
+        print("\nAll Vertices:")
+        [print(n.id, (n.x, n.y)) for n in self.vertices]
+
+        self.sort_primary_vertices()
+        print("\nSorted Primary Vertices:")
+        [print(n.id, (n.x, n.y)) for n in self.primary_vertices]
+
+        while self.primary_vertices is not []:
+            # 1. get vertex from list of primary vertices
+            current_vx: Vertex = self.primary_vertices.pop(0)
 
             # 2. does a next PN exist in this level?
             try:
                 # exception will happen here
-                next_primary_node: GraphItem = self.primary_coordinates[0]
-                print(f"next PN: {next_primary_node}")
+                next_vx: Vertex = self.primary_vertices[0]
+                print(f"\nNext PN: {next_vx.id} {(next_vx.x, next_vx.y)}")
 
-                if current_node[1][1] == next_primary_node[1][1]:
-                    print("PN exists in level, starting trace")
-                    self.trace_hexagon(current_node)  # trace the hexagon and continue
+                if current_vx.y == next_vx.y:
+                    print(f"PN exists in level, starting trace for {current_vx.id}")
+                    self.trace_hexagon(current_vx)  # trace the hexagon and continue
                 else:
                     print("PN doesn't exists in level, moving to next level")
             except IndexError:
-                print("no more primary nodes")
+                print("\nNo more primary vertices")
                 break
 
     def calculate_coordinates(self) -> None:
-        """Calculates coordinates for all nodes.
+        """Calculates coordinates for all vertices.
 
         Coordinates take place in the standard x-y-axial coordinate system.
         Each hexagon is composed of 6 coordinates. They follow the @self.moveset
@@ -349,45 +343,41 @@ class Benzy:
         From (2,1) you get to (4,0) by applying (+2,-1) or a down-right move, and
         so on (check @__next_rotation for more details).
 
-        At the same time mark "primary" nodes" for the purpose of filling up the
-        system after coordinates for boundary nodes are calculated (check @__fill_me_up
+        At the same time mark "primary" vertices" for the purpose of filling up the
+        system after coordinates for boundary vertices are calculated (check @__fill_me_up
         for more details).
         """
         rotation = 0  # starting rotation
-        node_id: Vertex = 1  # starting node
-        self.coordinates: CoordinateDict = {node_id: (0, 0)}  # starting position
-        self.primary_coordinates: CoordinateList = [] # primary nodes
+        id = 1
+        cur_vx = Vertex(id, (0, 0))  # starting vertex
+        self.vertices.append(cur_vx)  # starting position
 
         for digit in self.bec:
             digit = int(digit)
             for _ in range(digit):
-                node_id += 1
-                print(f"digit: {digit}, node id: {node_id}, rotation: {rotation}, move: {self.moveset[rotation]}")
+                id += 1
 
-                self.add_coordinates(node_id, rotation, None)
+                print(f"digit: {digit}, vx id: {id}, rotation: {
+                      rotation}, move: {self.moveset[rotation]}")
+
+                # add next vertex to list based on rotation
+                next_coordinates = cur_vx.move(self.moveset[rotation])
+                cur_vx = Vertex(id, next_coordinates)
+                self.vertices.append(cur_vx)
 
                 rotation = self.next_rotation(rotation)
             rotation -= 2  # store next starting direction
 
-        # pop the last coordinate (it shadows the first node)
-        self.coordinates.pop(len(self.coordinates))
+        # pop the last coordinate (it shadows the first vertex)
+        self.vertices.pop(-1)
 
-        print("\nEdges:")
-        pprint(list(self.graph.edges()))
-        print()
+        # traverse the coordinates again and find primary vertices on the boundary
+        for vx in self.vertices:
+            if self.is_primary(vx):
+                self.primary_vertices.append(vx)
 
-        # traverse the coordinates again and find primary nodes on the boundary
-        for node_id, coordinates in self.coordinates.items():
-            if self.is_primary(coordinates):
-                print()
-                print(node_id, end=", ")
-                node_type: str = self.boundary_primary_type(coordinates)
-                self.primary_coordinates.append((node_id, coordinates, node_type))
-        print()
-
-        pprint(self.primary_coordinates)
-        # add missing edges and nodes to the list
-        # self.fill_me_up()
+        # add missing edges and vertices to the list
+        self.fill_me_up()
 
 
 if __name__ == "__main__":
@@ -398,6 +388,9 @@ if __name__ == "__main__":
             print(e, end=" ")
         print()
 
-    for b in sys.argv[1:]:
-        bs = Benzy(b)
-        bs.draw_benzenoid_system()
+    # for b in sys.argv[1:]:
+    #     bs = Benzy(b)
+    #     bs.draw_benzenoid_system()
+
+    bs = Benzy("3233321112523242211122")
+    bs.draw_benzenoid_system()
