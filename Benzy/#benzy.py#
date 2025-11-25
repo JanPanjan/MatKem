@@ -9,7 +9,6 @@ Coordinates = tuple[int, int]
 
 
 class Vertex():
-
     def __init__(self, vx_id: int, coordinates: Coordinates, vx_type: str | None = None) -> None:
         self.id: int = vx_id
         self.type: str | None = vx_type
@@ -161,7 +160,7 @@ class Benzy:
         """Sort PN coordinates descending by y and ascending by x."""
         n = len(self.primary_vertices)
         for i in range(n):
-            for j in range(i + 1, n):
+OB            for j in range(i + 1, n):
                 # descending by y, when y are different
                 if self.primary_vertices[i].y < self.primary_vertices[j].y:
                     tmp = self.primary_vertices[i]
