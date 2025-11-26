@@ -1,0 +1,32 @@
+
+cubic10_wiener.txt:
+
+85.0 I?BeeOwM?
+85.0 I?Bcu`gM?
+85.0 I?bFB_wF?
+90.0 I?bEHow[?
+85.0 I?`bfAWF?
+
+cubic12_wiener.txt:
+
+152.0 K??FEb_F?wD_
+142.0 K??FEbGL@WB_
+144.0 K??FEagT@WB_
+136.0 K??FEaKY@gB_
+132.0 K??FEaKR@oE_
+
+cubic14_wiener.txt:
+
+211.0 M???FB_eAgBOH_B_?
+237.0 M???FBOw@oAoB_B_?
+229.0 M???FBOw@WBOD_B_?
+209.0 M???FBOq@KF?D_B_?
+213.0 M???FBOq@KCoF?E_?
+
+wiener.txt:
+
+
+cubic10_wiener.txt:
+
+85.0 I?BeeOwM?
+85.0 I?Bcu`gM?
