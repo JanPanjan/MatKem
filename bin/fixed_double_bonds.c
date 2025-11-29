@@ -2537,7 +2537,7 @@ static const char __pyx_k_send[] = "send";
 static const char __pyx_k_skek[] = "skek";
 static const char __pyx_k_spec[] = "__spec__";
 static const char __pyx_k_test[] = "__test__";
-static const char __pyx_k_Graph[] = "Graph";
+static const char __pyx_k_nx.nx.Graph[] = "nx.nx.Graph";
 static const char __pyx_k_close[] = "close";
 static const char __pyx_k_edges[] = "edges";
 static const char __pyx_k_g_adj[] = "g_adj";
@@ -2590,7 +2590,7 @@ static const char __pyx_k_new_matching[] = "new_matching";
 static const char __pyx_k_class_getitem[] = "__class_getitem__";
 static const char __pyx_k_missing_header[] = "missing header";
 static const char __pyx_k_to_numpy_array[] = "to_numpy_array";
-static const char __pyx_k_to_graph6_bytes[] = "to_graph6_bytes";
+static const char __pyx_k_to_nx.Graph6_bytes[] = "to_nx.Graph6_bytes";
 static const char __pyx_k_current_matching[] = "current_matching";
 static const char __pyx_k_number_of_kek_str[] = "number_of_kek_str";
 static const char __pyx_k_remove_nodes_from[] = "remove_nodes_from";
@@ -2713,7 +2713,7 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 /* #### Code section: constant_name_defines ### */
 #define __pyx_kp_u_ __pyx_string_tab[0]
 #define __pyx_kp_u_Calculate_number_of_fixed_doubl __pyx_string_tab[1]
-#define __pyx_n_u_Graph __pyx_string_tab[2]
+#define __pyx_n_u_nx.nx.Graph __pyx_string_tab[2]
 #define __pyx_n_u_ValueError __pyx_string_tab[3]
 #define __pyx_n_u_adj __pyx_string_tab[4]
 #define __pyx_n_u_all_kekule_structures __pyx_string_tab[5]
@@ -2801,7 +2801,7 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_sys __pyx_string_tab[87]
 #define __pyx_n_u_test __pyx_string_tab[88]
 #define __pyx_n_u_throw __pyx_string_tab[89]
-#define __pyx_n_u_to_graph6_bytes __pyx_string_tab[90]
+#define __pyx_n_u_to_nx.Graph6_bytes __pyx_string_tab[90]
 #define __pyx_n_u_to_numpy_array __pyx_string_tab[91]
 #define __pyx_n_u_u __pyx_string_tab[92]
 #define __pyx_n_u_v __pyx_string_tab[93]
@@ -5745,7 +5745,7 @@ __Pyx_RefNannySetupContext("PyInit_fixed_double_bonds", 0);
  *         sys.exit()
  *     f_name = sys.argv[1]             # <<<<<<<<<<<<<<
  *     for g_adj in read_plc(f_name):
- *         g = networkx.Graph(g_adj)
+ *         g = networkx.nx.nx.Graph(g_adj)
 */
     __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_sys); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 83, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
@@ -5762,7 +5762,7 @@ __Pyx_RefNannySetupContext("PyInit_fixed_double_bonds", 0);
  *         sys.exit()
  *     f_name = sys.argv[1]
  *     for g_adj in read_plc(f_name):             # <<<<<<<<<<<<<<
- *         g = networkx.Graph(g_adj)
+ *         g = networkx.nx.nx.Graph(g_adj)
  *         # kek1 = number_of_kek_str(g)
 */
     __pyx_t_8 = NULL;
@@ -5847,14 +5847,14 @@ __Pyx_RefNannySetupContext("PyInit_fixed_double_bonds", 0);
       /* "fixed_double_bonds.py":85
  *     f_name = sys.argv[1]
  *     for g_adj in read_plc(f_name):
- *         g = networkx.Graph(g_adj)             # <<<<<<<<<<<<<<
+ *         g = networkx.nx.nx.Graph(g_adj)             # <<<<<<<<<<<<<<
  *         # kek1 = number_of_kek_str(g)
  *         kek_list = all_kekule_structures(g)
 */
       __pyx_t_2 = NULL;
       __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_networkx); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 85, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_Graph); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 85, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_nx.nx.Graph); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 85, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_g_adj); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 85, __pyx_L1_error)
@@ -5884,11 +5884,11 @@ __Pyx_RefNannySetupContext("PyInit_fixed_double_bonds", 0);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
       /* "fixed_double_bonds.py":87
- *         g = networkx.Graph(g_adj)
+ *         g = networkx.nx.nx.Graph(g_adj)
  *         # kek1 = number_of_kek_str(g)
  *         kek_list = all_kekule_structures(g)             # <<<<<<<<<<<<<<
  *         k = len(kek_list)
- *         g6 = networkx.to_graph6_bytes(g).decode().strip()
+ *         g6 = networkx.to_nx.Graph6_bytes(g).decode().strip()
 */
       __pyx_t_10 = NULL;
       __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_all_kekule_structures); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 87, __pyx_L1_error)
@@ -5923,7 +5923,7 @@ __Pyx_RefNannySetupContext("PyInit_fixed_double_bonds", 0);
  *         # kek1 = number_of_kek_str(g)
  *         kek_list = all_kekule_structures(g)
  *         k = len(kek_list)             # <<<<<<<<<<<<<<
- *         g6 = networkx.to_graph6_bytes(g).decode().strip()
+ *         g6 = networkx.to_nx.Graph6_bytes(g).decode().strip()
  *         # print('Number of Kekule structures:', kek1, kek2)
 */
       __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_kek_list); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 88, __pyx_L1_error)
@@ -5938,14 +5938,14 @@ __Pyx_RefNannySetupContext("PyInit_fixed_double_bonds", 0);
       /* "fixed_double_bonds.py":89
  *         kek_list = all_kekule_structures(g)
  *         k = len(kek_list)
- *         g6 = networkx.to_graph6_bytes(g).decode().strip()             # <<<<<<<<<<<<<<
+ *         g6 = networkx.to_nx.Graph6_bytes(g).decode().strip()             # <<<<<<<<<<<<<<
  *         # print('Number of Kekule structures:', kek1, kek2)
  *         freq = {}
 */
       __pyx_t_13 = NULL;
       __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_networkx); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 89, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_14);
-      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_to_graph6_bytes); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 89, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_to_nx.Graph6_bytes); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 89, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
       __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_g); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 89, __pyx_L1_error)
@@ -5997,7 +5997,7 @@ __Pyx_RefNannySetupContext("PyInit_fixed_double_bonds", 0);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
       /* "fixed_double_bonds.py":91
- *         g6 = networkx.to_graph6_bytes(g).decode().strip()
+ *         g6 = networkx.to_nx.Graph6_bytes(g).decode().strip()
  *         # print('Number of Kekule structures:', kek1, kek2)
  *         freq = {}             # <<<<<<<<<<<<<<
  *         for kek in kek_list:
@@ -6563,7 +6563,7 @@ __Pyx_RefNannySetupContext("PyInit_fixed_double_bonds", 0);
  *         sys.exit()
  *     f_name = sys.argv[1]
  *     for g_adj in read_plc(f_name):             # <<<<<<<<<<<<<<
- *         g = networkx.Graph(g_adj)
+ *         g = networkx.nx.nx.Graph(g_adj)
  *         # kek1 = number_of_kek_str(g)
 */
     }
@@ -6656,7 +6656,7 @@ static const char * const __pyx_string_tab_encodings[] = { 0 };
 static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_, sizeof(__pyx_k_), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_ */
   {__pyx_k_Calculate_number_of_fixed_doubl, sizeof(__pyx_k_Calculate_number_of_fixed_doubl), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_Calculate_number_of_fixed_doubl */
-  {__pyx_k_Graph, sizeof(__pyx_k_Graph), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Graph */
+  {__pyx_k_nx.nx.Graph, sizeof(__pyx_k_nx.nx.Graph), 0, 1, 1}, /* PyObject cname: __pyx_n_u_nx.nx.Graph */
   {__pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ValueError */
   {__pyx_k_adj, sizeof(__pyx_k_adj), 0, 1, 1}, /* PyObject cname: __pyx_n_u_adj */
   {__pyx_k_all_kekule_structures, sizeof(__pyx_k_all_kekule_structures), 0, 1, 1}, /* PyObject cname: __pyx_n_u_all_kekule_structures */
@@ -6744,7 +6744,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_sys, sizeof(__pyx_k_sys), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sys */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
   {__pyx_k_throw, sizeof(__pyx_k_throw), 0, 1, 1}, /* PyObject cname: __pyx_n_u_throw */
-  {__pyx_k_to_graph6_bytes, sizeof(__pyx_k_to_graph6_bytes), 0, 1, 1}, /* PyObject cname: __pyx_n_u_to_graph6_bytes */
+  {__pyx_k_to_nx.Graph6_bytes, sizeof(__pyx_k_to_nx.Graph6_bytes), 0, 1, 1}, /* PyObject cname: __pyx_n_u_to_nx.Graph6_bytes */
   {__pyx_k_to_numpy_array, sizeof(__pyx_k_to_numpy_array), 0, 1, 1}, /* PyObject cname: __pyx_n_u_to_numpy_array */
   {__pyx_k_u, sizeof(__pyx_k_u), 0, 1, 1}, /* PyObject cname: __pyx_n_u_u */
   {__pyx_k_v, sizeof(__pyx_k_v), 0, 1, 1}, /* PyObject cname: __pyx_n_u_v */

@@ -69,7 +69,7 @@ typedef struct e2 /* The shortened data type used for edges in the triangular ne
 typedef EDGE* PLANMAP[MAXNV]; /* Planmap[i] is an arbitrary edge starting at vertex i. 
                             WHICH edge is chosen is arbitrary. No function can rely 
 			    on this edge not changing after something "has been done
-			    to the graph" -- when returning, it might be another 
+			    to the nx.nx.Graph" -- when returning, it might be another 
 			    arbitrary edge. */
 
 #define FALSE 0
@@ -77,7 +77,7 @@ typedef EDGE* PLANMAP[MAXNV]; /* Planmap[i] is an arbitrary edge starting at ver
 
 /* Global variables */
 
-int maxnv=0, nv; /* The vertex number of the final graph -- that is: The facenumber of the
+int maxnv=0, nv; /* The vertex number of the final nx.nx.Graph -- that is: The facenumber of the
                 the dual (maxnv) and the temporary vertex number during the construction */
 
 int ne; /* number of ORIENTED edges -- twice the number of unoriented edges */
@@ -114,7 +114,7 @@ int must_be_catacondensed=0;
                 /* the number of oriented edges in the dual of a catacondensed structure:
                    2*maxnv-2 -- the same as Chdifference */
 
-PLANMAP map;    /* What it is all about: This contains the graph to be constructed */
+PLANMAP map;    /* What it is all about: This contains the nx.nx.Graph to be constructed */
 
 int degree[MAXNV]; /* The valency of the vertices */
 
@@ -2823,7 +2823,7 @@ canon(int colour_prev[], EDGE *can_numberings[][MAXE],
    Returns 1 if yes, 0 if not. One of the criterions a canonical vertex 
    must fulfill, is that its colour is minimal. 
    A possible starting edge for the construction of a representation is 
-   one with lexicographically minimal colour pair (start,INT_MAX-end).
+   one with lexiconx.Graphically minimal colour pair (start,INT_MAX-end).
    In can_numberings[][] the canonical numberings are stored as sequences 
    of oriented edges.  For every 0 <= i,j < *num_can_numberings and every 
    0 <= k < ne the edges can_numberings[i][k] and can_numberings[j][k] can 
@@ -2851,7 +2851,7 @@ canon(int colour_prev[], EDGE *can_numberings[][MAXE],
    For the helicenes program there is exactly one face that is not a triangle (in case
    nv>3 -- otherwise the vertex with minimum colour -- which is minimum degree in this
    case -- can always be deleted). This face is chosen as the outer face. A vertex
-   lying in the outer face can not be deleted in case the graph breaks in two (or more)
+   lying in the outer face can not be deleted in case the nx.nx.Graph breaks in two (or more)
    parts if this is done. This is exactly the case if it occurs in the boundary more than
    once. The last vertex (nv-1) can always be deleted by construction -- it was just added !
    Vertices with valency one can also always be deleted, so in case the last vertex has
@@ -3132,7 +3132,7 @@ void write_combinatrica()
   EDGE *ed;
   int i,j;
 
-  out = fopen("graph.cmb","w");
+  out = fopen("nx.nx.Graph.cmb","w");
 
   for(i = 0;i<nv;i++) {
     j = 1;

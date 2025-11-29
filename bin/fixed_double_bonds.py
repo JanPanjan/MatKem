@@ -6,23 +6,25 @@ import numpy
 
 
 def read_plc(f_name):
-    f_in = open(f_name, 'rb')
-    header = '>>planar_code<<'
+    f_in = open(f_name, "rb")
+    header = ">>planar_code<<"
     if f_in.read(len(header)).decode() != header:
-        raise ValueError('missing header')
+        raise ValueError("missing header")
     while True:
         n_byte = f_in.read(1)
         if len(n_byte) == 0:
             break  # End of file
         b_mode = 1
-        n = int.from_bytes(n_byte, byteorder='little', signed=False)
+        n = int.from_bytes(n_byte, byteorder="little", signed=False)
         if n == 0:
             b_mode = 2
-            n = int.from_bytes(f_in.read(2), byteorder='little', signed=False)
+            n = int.from_bytes(f_in.read(2), byteorder="little", signed=False)
         g = {i: [] for i in range(1, n + 1)}
         for i in range(1, n + 1):
             while True:
-                neigh = int.from_bytes(f_in.read(b_mode), byteorder='little', signed=False)
+                neigh = int.from_bytes(
+                    f_in.read(b_mode), byteorder="little", signed=False
+                )
                 if neigh == 0:
                     break
                 g[i].append(neigh)
@@ -68,25 +70,27 @@ def all_kekule_structures(g):
 
 def number_of_kek_str(g):
     adj = networkx.to_numpy_array(g)
-    kek = abs(numpy.linalg.det(adj))**0.5
+    kek = abs(numpy.linalg.det(adj)) ** 0.5
     return round(kek)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("""
+        print(
+            """
     Calculate number of fixed double bonds present in given kekule structures
 
     Usage: ./fixed_double_bonds.py <plc-code>
-        """)
+        """
+        )
         sys.exit()
     f_name = sys.argv[1]
     for g_adj in read_plc(f_name):
-        g = networkx.Graph(g_adj)
+        g = networkx.nx.nx.Graph(g_adj)
         # kek1 = number_of_kek_str(g)
         kek_list = all_kekule_structures(g)
         k = len(kek_list)
-        g6 = networkx.to_graph6_bytes(g).decode().strip()
+        g6 = networkx.to_nx.Graph6_bytes(g).decode().strip()
         # print('Number of Kekule structures:', kek1, kek2)
         freq = {}
         for kek in kek_list:

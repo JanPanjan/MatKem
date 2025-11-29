@@ -1,23 +1,26 @@
+"""Program for visualizing a benzenoid system."""
+
 import math
 import sys
 from pprint import pprint
-from networkx import Graph
 import networkx as nx
 import matplotlib.pyplot as plt
 
 Coordinates = tuple[int, int]
 
 
-class Vertex():
+class Vertex:
 
-    def __init__(self, vx_id: int, coordinates: Coordinates, vx_type: str | None = None) -> None:
+    def __init__(
+        self, vx_id: int, coordinates: Coordinates, vx_type: str | None = None
+    ) -> None:
         self.id: int = vx_id
         self.type: str | None = vx_type
         self.x: int = coordinates[0]
         self.y: int = coordinates[1]
 
     def move(self, move_step: Coordinates) -> Coordinates:
-        """ Moves vertex to new coordinates. """
+        """Moves vertex to new coordinates."""
         return (self.x + move_step[0], self.y + move_step[1])
 
 
@@ -44,15 +47,15 @@ class Benzy:
     def __init__(self, bec: str) -> None:
         self.bec: str = self.check_bec(bec)
         self.perimiter_vertices: int = sum(int(d) for d in self.bec)
-        self.graph: Graph = self.graph_from_bec()
+        self.graph: nx.Graph = self.graph_from_bec()
         self.calculate_coordinates()
         self.coordinates: list[Coordinates] = self.get_coordinates()
 
-    def graph_from_bec(self) -> Graph:
-        """Creates a networkx graph."""
-        g = Graph()
+    def graph_from_bec(self) -> nx.Graph:
+        """Creates a networkx nx.Graph."""
+        g = nx.Graph()
         g.add_edges_from([(i, i + 1) for i in range(1, self.perimiter_vertices)])
-        g.add_edge(self.perimiter_vertices, 1)  # connect the graph
+        g.add_edge(self.perimiter_vertices, 1)  # connect the nx.Graph
         return g
 
     def draw_benzenoid_system(self) -> None:
@@ -81,7 +84,7 @@ class Benzy:
         return bec
 
     def get_vertex_id(self, coordinates: Coordinates, strict=False) -> int | None:
-        """ Finds vertex with given coordinates. """
+        """Finds vertex with given coordinates."""
 
         print(f"searching for {coordinates} ... ", end="")
         for vx in self.vertices:
@@ -106,11 +109,10 @@ class Benzy:
         lst = [(vx.x, vx.y) for vx in self.vertices]
         return lst
 
-    def add_vertex(self,
-                   new_id: int,
-                   rotation: int,
-                   predecessor: Vertex | None = None) -> None:
-        """ Adds new coordinates to system coordinate dictionary. """
+    def add_vertex(
+        self, new_id: int, rotation: int, predecessor: Vertex | None = None
+    ) -> None:
+        """Adds new coordinates to system coordinate dictionary."""
         if predecessor is None:
             predecessor = self.vertices[new_id - 1]
         move_step: Coordinates = self.moveset[rotation]
@@ -148,9 +150,7 @@ class Benzy:
 
         """
         return (
-            vx.x % 2 == 0
-            and vx.y % 3 == 0
-            and self.find_coordinates((vx.x, vx.y - 2))
+            vx.x % 2 == 0 and vx.y % 3 == 0 and self.find_coordinates((vx.x, vx.y - 2))
         )
 
     def is_inner_primary(self, vx: Vertex) -> bool:
@@ -358,8 +358,10 @@ class Benzy:
             for _ in range(digit):
                 id += 1
 
-                print(f"digit: {digit}, vx id: {id}, rotation: {
-                      rotation}, move: {self.moveset[rotation]}")
+                print(
+                    f"digit: {digit}, vx id: {id}, rotation: {
+                      rotation}, move: {self.moveset[rotation]}"
+                )
 
                 # add next vertex to list based on rotation
                 next_coordinates = cur_vx.move(self.moveset[rotation])
