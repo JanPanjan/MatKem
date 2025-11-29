@@ -8,7 +8,7 @@ python -m pip install networkx matplotlib
 
 # Example usages
 
-## `benzy.py
+## `benzy.py`
 
 > [!CAUTION]
 > does not work currently
@@ -17,7 +17,7 @@ python -m pip install networkx matplotlib
 python3 benzy.py 5312351231
 ```
 
-## `index_calculations.py
+## `index_calculations.py`
 
 ```bash
 python3 index_calculations.py ../data/2fb.bec wiener
