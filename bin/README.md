@@ -10,7 +10,7 @@ python -m pip install networkx matplotlib
 
 ## `benzy.py
 
-> [!warn]
+> [!CAUTION]
 > does not work currently
 
 ```bash
