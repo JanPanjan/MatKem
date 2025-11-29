@@ -1,4 +1,0 @@
-boundary primary nodes
-    if left-up neighbour has edge with you: left
-    if right-up neighbour has edge with you: right
-    else: neither (won't happen)
