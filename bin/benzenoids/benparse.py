@@ -1,6 +1,6 @@
 """Module for parsing different benzenoid graph formats into `nx.Graph`"""
 import networkx as nx
-import sys
+
 
 def from_g6(raw_g6: str) -> nx.Graph:
     """Creates a `nx.Graph.` from a g6 string."""
@@ -8,6 +8,7 @@ def from_g6(raw_g6: str) -> nx.Graph:
     g = nx.from_graph6_bytes(g6s.encode("ascii"))
 
     return g
+
 
 def from_bec(raw_bec: str) -> nx.Graph:
     """Creates a `nx.Graph.` from a BEC string."""
@@ -20,6 +21,7 @@ def from_bec(raw_bec: str) -> nx.Graph:
 
     return g
 
+
 def _check_bec(raw_bec: str) -> str:
     """Makes sure the provided BEC is valid.
 
@@ -30,7 +32,8 @@ def _check_bec(raw_bec: str) -> str:
     try:
         for d in bec:
             if int(d) == 6 or int(d) == 0:
-                raise ValueError("Illegal boundary edges code. Cannot contain 6 or 0")
+                raise ValueError(
+                    "Illegal boundary edges code. Cannot contain 6 or 0")
     except Exception as e:
         raise Exception(f"Error occured: {e}")
 
