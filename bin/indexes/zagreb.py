@@ -73,6 +73,6 @@ if __name__ == "__main__":
         print_help()
         sys.exit(1)
 
-    cfg = Config(file_path=sys.argv[1])
+    cfg = cli.Config(file_path=sys.argv[1])
     print(cfg)
     run(cfg)
