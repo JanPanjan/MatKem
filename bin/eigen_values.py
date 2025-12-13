@@ -3,9 +3,22 @@
 import numpy as np
 import networkx as nx
 
-# g = nx.Graph([(1,2), (2,3), (3,4)])
+cube = nx.Graph([
+    (1, 2), (2, 3), (3, 4), (4, 1)
+])
 
-AAA = nx.Graph([
+benzenoid_linear_2 = nx.Graph([
+    (1, 2), (1, 6), (1, 10),
+    (2, 3), (2, 7),
+    (3, 4),
+    (4, 5),
+    (5, 6),
+    (7, 8),
+    (8, 9),
+    (9, 10),
+])
+
+bicyclo_octane = nx.Graph([
     (1, 2), (1, 5), (1, 8),
     (2, 3), (2, 6),
     (3, 4),
@@ -58,13 +71,43 @@ def eigs(g: nx.Graph) -> tuple[np.ndarray, np.ndarray]:
 def neutral_configuration(g: nx.Graph) -> list[int]:
     """ Returns neutral configuration based on eigen values (reverse order). """
     eigval, _ = eigs(g)
-    nc = {}
-    for v in eigval:
-        if v not in nc:
-            nc[v] = 1
+    v = [0] * len(eigval) # vector for neutral configuration
+    frq = {}
+
+    for val in eigval:
+        if val not in frq:
+            frq[val] = 1
         else:
-            nc[v] += 1
-    return list(nc.values())
+            frq[val] += 1
+
+    ncc = list(frq.values())
+    cur_id = 0
+    num_orb = len(eigval)
+    # print("num orb:", num_orb, "ncc:", ncc)
+
+    for n in ncc:
+        r = range(cur_id, cur_id + n)
+        fill = 2 * n
+        # print("n:", n)
+        # print("range:", r)
+        # print("cur_id:", cur_id)
+        while fill > 0 and num_orb > 0:
+            b = False
+            for _ in range(n):
+                for i in r:
+                    v[i] += 1
+                    fill -= 1
+                    num_orb -= 1
+                    if num_orb == 0:
+                        b = True
+                        break
+                if b:
+                    break
+                # print(" v:", v, end=",")
+                # print(" fill:", fill)
+        cur_id += n
+
+    return v
 
 
 def total_pi_charge(g: nx.Graph) -> list[float]:
@@ -88,14 +131,26 @@ def eig(g: nx.Graph) -> None:
 
 
 if __name__ == "__main__":
-    """ 
+    print("-------------------- cube --------------------")
+    eig(cube)
+    print("neutral configuration:", neutral_configuration(cube), end="\n\n")
+
+    print("-------------------- linear benzenoid 2 --------------------")
+    eig(benzenoid_linear_2)
+    print("neutral configuration:", neutral_configuration(benzenoid_linear_2), end="\n\n")
+
+    print("-------------------- bicyclo octane --------------------")
+    eig(bicyclo_octane)
+    print("neutral configuration:", neutral_configuration(bicyclo_octane), end="\n\n")
+
     print("-------------------- benzene --------------------")
     eig(benzene)
+    print("neutral configuration:", neutral_configuration(benzene), end="\n\n")
+
     print("-------------------- cubane --------------------")
     eig(cubane)
+    print("neutral configuration:", neutral_configuration(cubane), end="\n\n")
+
     print("-------------------- c7 --------------------")
     eig(c7)
-    """
-    # nc_b = neutral_configuration(benzene)
-    total_pi_charge(benzene)
-    # print(nc_b)
+    print("neutral configuration:", neutral_configuration(c7), end="\n\n")
