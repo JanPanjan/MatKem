@@ -1,3 +1,5 @@
+// https://github.com/CaGe-graph/CaGe/blob/master/Generators/catacondensed.c
+
 #include <stdio.h> 
 #include <ctype.h>
 #include <string.h>
