@@ -1,5 +1,6 @@
 #!/bin/python3
 
+import sys
 import numpy as np
 import networkx as nx
 
@@ -131,26 +132,42 @@ def eig(g: nx.Graph) -> None:
 
 
 if __name__ == "__main__":
-    print("-------------------- cube --------------------")
-    eig(cube)
-    print("neutral configuration:", neutral_configuration(cube), end="\n\n")
+    try:
+        match sys.argv[1]:
+            case "cube":
+                print("-------------------- cube --------------------")
+                eig(cube)
+                print("neutral configuration:", neutral_configuration(cube), end="\n\n")
+            case "lb2":
+                print("-------------------- linear benzenoid 2 --------------------")
+                eig(benzenoid_linear_2)
+                print("neutral configuration:", neutral_configuration(benzenoid_linear_2), end="\n\n")
+            case "bioct":
+                print("-------------------- bicyclo octane --------------------")
+                eig(bicyclo_octane)
+                print("neutral configuration:", neutral_configuration(bicyclo_octane), end="\n\n")
+            case "benzene":
+                print("-------------------- benzene --------------------")
+                eig(benzene)
+                print("neutral configuration:", neutral_configuration(benzene), end="\n\n")
+            case "cubane":
+                print("-------------------- cubane --------------------")
+                eig(cubane)
+                print("neutral configuration:", neutral_configuration(cubane), end="\n\n")
+            case "c7":
+                print("-------------------- c7 --------------------")
+                eig(c7)
+                print("neutral configuration:", neutral_configuration(c7), end="\n\n")
+    except IndexError:
+        print("""
+usage: python3 eigen_values.py <str> 
 
-    print("-------------------- linear benzenoid 2 --------------------")
-    eig(benzenoid_linear_2)
-    print("neutral configuration:", neutral_configuration(benzenoid_linear_2), end="\n\n")
+print eigen values and eigen vectors for structure (select one): 
 
-    print("-------------------- bicyclo octane --------------------")
-    eig(bicyclo_octane)
-    print("neutral configuration:", neutral_configuration(bicyclo_octane), end="\n\n")
-
-    print("-------------------- benzene --------------------")
-    eig(benzene)
-    print("neutral configuration:", neutral_configuration(benzene), end="\n\n")
-
-    print("-------------------- cubane --------------------")
-    eig(cubane)
-    print("neutral configuration:", neutral_configuration(cubane), end="\n\n")
-
-    print("-------------------- c7 --------------------")
-    eig(c7)
-    print("neutral configuration:", neutral_configuration(c7), end="\n\n")
+- cube
+- linear benzenoid 2 (lb2)
+- bicyclo octane (bioct)
+- benzene
+- cubane
+- c7
+        """)
