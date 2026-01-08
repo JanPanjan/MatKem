@@ -30,7 +30,6 @@ edge_list = [(u, v) for v in cube for u in cube[v] if u < v]
 points = Points(coordinates_list, r=10, c='green')
 lines = Lines([[coordinates[u], coordinates[v]] for u, v in edge_list], c='black')
 
-# --- Pyramid structure ---
 pyramid = {
     1: [2, 4, 5],
     2: [1, 3, 5],
@@ -39,7 +38,6 @@ pyramid = {
     5: [1, 2, 3, 4],
 }
 
-# Pyramid coordinates shifted in +x so it appears beside the cube
 pyramid_coordinates = {
     1: (2.0, 0.0, 0.0),
     2: (3.0, 0.0, 0.0),
