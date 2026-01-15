@@ -77,6 +77,8 @@ def get_coordinates(g, kx, ky, kz):
                   eigvec[i - 1, n - kz]) for i in range(1, n + 1)}
     return coords
 
+# --------------------------------------------------------------------------
+
 f_list = load_fullerenes(sys.argv[1])
 total = len(f_list)
 
